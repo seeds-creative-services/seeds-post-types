@@ -65,7 +65,7 @@ class SeedsPostTypes {
           'edit_item' => "Edit " . strtolower($postType['name']['singular']),
           'view_item' => "View " . strtolower($postType['name']['singular']),
           'all_items' => "All " . $postType['name']['multiple'],
-          'not_found' => "No " . strtolower($postType['name']['multiple']) . " found"
+          'not_found' => "No " . strtolower($postType['name']['multiple']) . " to show"
         );
     
         $postTypeArgs = array(
@@ -73,7 +73,8 @@ class SeedsPostTypes {
           'public' => $postType['public'],
           'show_ui' => $postType['show']['ui'],
           'show_in_menu' => $postType['show']['menu'],
-          'supports' => $postType['supports']
+          'supports' => array_key_exists('supports', $postType) ? $postType['supports']: ["title", "editor", "thumbnail"],
+          'rewrite' => array_key_exists('rewrite', $postType) ? $postType['rewrite'] : []
         );
   
         register_post_type($postType['slug'], $postTypeArgs);
