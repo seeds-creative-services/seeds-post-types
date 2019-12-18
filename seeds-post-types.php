@@ -74,7 +74,8 @@ class SeedsPostTypes {
           'show_ui' => $postType['show']['ui'],
           'show_in_menu' => $postType['show']['menu'],
           'supports' => array_key_exists('supports', $postType) ? $postType['supports']: ["title", "editor", "thumbnail"],
-          'rewrite' => array_key_exists('rewrite', $postType) ? $postType['rewrite'] : []
+          'rewrite' => array_key_exists('rewrite', $postType) ? $postType['rewrite'] : [],
+          'taxonomies' => array_key_exists('taxonomies', $postType) ? $postType['taxonomies'] : []
         );
   
         register_post_type($postType['slug'], $postTypeArgs);
