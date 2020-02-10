@@ -75,10 +75,18 @@ class SeedsPostTypes {
           'show_in_menu' => $postType['show']['menu'],
           'supports' => array_key_exists('supports', $postType) ? $postType['supports']: ["title", "editor", "thumbnail"],
           'rewrite' => array_key_exists('rewrite', $postType) ? $postType['rewrite'] : [],
-          'taxonomies' => array_key_exists('taxonomies', $postType) ? $postType['taxonomies'] : []
+          'taxonomies' => array_key_exists('taxonomies', $postType) ? $postType['taxonomies'] : [],
+          'show_in_rest' => array_key_exists('gutenberg', $postType) ? true : false
         );
+
+        // Enable Gutenberg support.
+        if(array_key_exists('gutenberg', $postType) && $postType['gutenberg'] === true) {
+            array_push($postTypeArgs['supports'], 'editor');
+        }
   
         register_post_type($postType['slug'], $postTypeArgs);
+
+        $this->RegisterPostTaxonomies($postType['slug'], $postTypeArgs['taxonomies']);
 
         if(array_key_exists('fields', $postType)) {
 
@@ -89,6 +97,38 @@ class SeedsPostTypes {
       }
 
     });
+
+  }
+
+  public function RegisterPostTaxonomies($postType, $taxonomies) {
+
+      foreach($taxonomies as $slug => $taxonomy) {
+
+          $taxonomyLabels = array(
+              'name' => $taxonomy['name']['multiple'],
+              'singular_name' => $taxonomy['name']['singular'],
+              'menu_name' => $taxonomy['name']['multiple'],
+              'add_new' => "Add New",
+              'add_new_item' => "New " . $taxonomy['name']['singular'],
+              'new_item' => "New " . strtolower($taxonomy['name']['singular']),
+              'edit_item' => "Edit " . strtolower($taxonomy['name']['singular']),
+              'view_item' => "View " . strtolower($taxonomy['name']['singular']),
+              'all_items' => "All " . $taxonomy['name']['multiple'],
+              'not_found' => "No " . strtolower($taxonomy['name']['multiple']) . " to show"
+          );
+
+          $taxonomyArgs = array(
+              'labels' => $taxonomyLabels,
+              'public' => $taxonomy['public'],
+              'show_ui' => $taxonomy['show']['ui'],
+              'show_in_menu' => $taxonomy['show']['menu'],
+              'supports' => array_key_exists('supports', $taxonomy) ? $taxonomy['supports']: ["title", "editor", "thumbnail"],
+              'rewrite' => array_key_exists('rewrite', $taxonomy) ? $taxonomy['rewrite'] : []
+          );
+
+          register_taxonomy($slug, array($postType), $taxonomyArgs);
+
+      }
 
   }
 
