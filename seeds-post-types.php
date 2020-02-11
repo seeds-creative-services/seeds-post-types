@@ -1,7 +1,7 @@
 <?php
 
 /**
-Plugin Name: Seeds Post Types
+Plugin Name: SEEDS: Custom Post Types
 Description: Custom post types for content creation and management.
 Version: 1.0.0
 Author: Seeds Creative Services, LLC.
@@ -9,9 +9,9 @@ Author URI: https://seedscreativeservices.com
 Text Domain: seeds_post_types
 */
 
-namespace SeedsPostTypes;
+namespace SEEDS\PLUGINS;
 
-class SeedsPostTypes {
+class PostTypes {
 
   public static $postTypes = array();
 
@@ -187,5 +187,4 @@ class SeedsPostTypes {
 
 }
 
-global $SeedsPostTypes;
-$SeedsPostTypes = new SeedsPostTypes;
+return new PostTypes;
