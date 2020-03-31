@@ -32,7 +32,10 @@ class PostTypes {
 
         if(is_file($postTypesDIR.'/'.$file)) {
 
+          $fileInfo = pathinfo($file);
+
           $postType = include_once($postTypesDIR . '/' . $file);
+          $postType['filename'] = $fileInfo['filename'];
           
           self::$postTypes[$postType['slug']] = $postType;
 
@@ -76,21 +79,36 @@ class PostTypes {
           'supports' => array_key_exists('supports', $postType) ? $postType['supports']: ["title", "editor", "thumbnail"],
           'rewrite' => array_key_exists('rewrite', $postType) ? $postType['rewrite'] : [],
           'taxonomies' => array_key_exists('taxonomies', $postType) ? $postType['taxonomies'] : [],
-          'show_in_rest' => array_key_exists('gutenberg', $postType) ? true : false
+          'show_in_rest' => array_key_exists('gutenberg', $postType) ? $postType['gutenberg'] : false
         );
-
-        // Enable Gutenberg support.
-        if(array_key_exists('gutenberg', $postType) && $postType['gutenberg'] === true) {
-            array_push($postTypeArgs['supports'], 'editor');
-        }
   
         register_post_type($postType['slug'], $postTypeArgs);
 
         $this->RegisterPostTaxonomies($postType['slug'], $postTypeArgs['taxonomies']);
 
+          if(file_exists(get_stylesheet_directory() . "/assets/dist/css/post-types/" . $postType['filename'] . ".css")) {
+
+              wp_register_style($postType['filename'], get_stylesheet_directory_uri() . "/assets/dist/css/post-types/" . $postType['filename'] . ".css", [], '1.0.0');
+              wp_enqueue_style($postType['filename']);
+
+          }
+
+          if(file_exists(get_stylesheet_directory() . "/assets/dist/js/post-types/" . $postType['filename'] . ".js")) {
+
+              wp_register_script($postType['filename'], get_stylesheet_directory_uri() . "/assets/dist/js/post-types/" . $postType['filename'] . ".js", ['jquery', 'wp-editor', 'wp-edit-post', 'wp-data'], '1.0.0');
+              wp_enqueue_script($postType['filename']);
+
+          }
+
         if(array_key_exists('fields', $postType)) {
 
           call_user_func($postType['fields'], $postType);
+
+        }
+
+        if(array_key_exists('table', $postType)) {
+
+            call_user_func($postType['table'], $postType);
 
         }
 
@@ -139,6 +157,9 @@ class PostTypes {
       foreach(self::$postTypes as $slug => $postType) {
 
         echo "<style type='text/css' media='all'>";
+        if(array_key_exists('icon-type', $postType)) {
+            echo ".menu-icon-" . $postType['slug'] . " .wp-menu-image::before { font-family: 'Font Awesome 5 " . $postType['icon-type'] . "' !important; }";
+        }
         echo ".menu-icon-" . $postType['slug'] . " .wp-menu-image::before { content: '\\" . $postType['icon'] . "' !important; }";
         echo "#dashboard_right_now a." . $postType['slug'] . "-count:before { content: '\\" . $postType['icon'] . "' !important; }";
         echo "</style>";
